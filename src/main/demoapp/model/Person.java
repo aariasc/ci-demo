@@ -2,10 +2,6 @@ package demoapp.model;
 
 import java.util.Date;
 
-/**
-* This class represents a Person entity, which handles first name, last name
-* and hire date.  This information is stored in the database
-*/
 public class Person {
 	private int id;
 	private String firstName;
