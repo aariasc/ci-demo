@@ -9,7 +9,7 @@ import demoapp.model.Person;
 public class PersonDAO {
 
 	public List<Person> getAll(){
-    private int x = 10;
+    private int x = 20;
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 	    session.beginTransaction();
 	    List<Person> result = session.createCriteria(Person.class).list();
