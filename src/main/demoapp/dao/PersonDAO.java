@@ -7,7 +7,6 @@ import org.hibernate.Session;
 import demoapp.model.Person;
 
 public class PersonDAO {
-  private int x = 20;
 	public List<Person> getAll(){    
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 	    session.beginTransaction();
