@@ -7,9 +7,8 @@ import org.hibernate.Session;
 import demoapp.model.Person;
 
 public class PersonDAO {
-
-	public List<Person> getAll(){
-    private int x = 20;
+  private int x = 20;
+	public List<Person> getAll(){    
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 	    session.beginTransaction();
 	    List<Person> result = session.createCriteria(Person.class).list();
