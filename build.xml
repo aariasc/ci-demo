@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+
+<project name="DemoApp" default="all" basedir=".">
+  <path id="classpath">
+    <fileset dir="${basedir}/WebContent/WEB-INF/lib">
+        <include name="*.jar"/>
+    </fileset>
+  </path>
+  
+  <taskdef resource="testngtasks" classpathref="classpath"/>
+  <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="classpath"/>
+  <taskdef resource="checkstyletask.properties" classpathref="classpath"/>
+  
+  <taskdef resource="liquibasetasks.properties">
+    <classpath refid="classpath"/>
+  </taskdef>
+  
+  <property name="buildDir" value="war"/>
+  <property name="app.name" value="demoapp"/>
+  <property name="warName" value="${app.name}.war"/>
+  <property name="tomcat.home" value="/home/aarias/apps/tomcat7"/>
+  
+  <target name="all" depends="clean, compile, codeanalysis, test, copy, war, generate.api.docs" />
+  <target name="deploy" depends="update.db, undeploy.war, deploy.war"/>
+  
+  <target name="clean">
+    <echo message="Cleaning..."/>
+    <delete failonerror="false" dir="${buildDir}"/>
+    <delete failonerror="false" file="${warName}"/>
+    <delete failonerror="false" file="build"/>
+    <delete failonerror="false" file="test-output"/>
+    <delete failonerror="false" file="api-docs"/>
+    <delete failonerror="false" file="code-analysis"/>
+  </target>
+  
+  <target name="compile">
+    <mkdir dir="${buildDir}/WEB-INF/classes"/>
+    <mkdir dir="${buildDir}/WEB-INF/lib"/>
+    <javac srcdir="src/main" destdir="${buildDir}/WEB-INF/classes" debug="true" includes="**/*.java" classpathref="classpath" />      
+  </target>
+  
+  <target name="copy">
+    <copy todir="${buildDir}">
+      <fileset dir="WebContent" includes="**/*.*" />
+    </copy>
+    <copy todir="${buildDir}/WEB-INF/classes/demoapp/model">
+      <fileset dir="src/main/demoapp/model" includes="*.xml" />
+    </copy>
+    <copy file="src/main/hibernate.cfg.xml"
+      tofile="${buildDir}/WEB-INF/classes/hibernate.cfg.xml"/>
+
+    <copy file="src/main/log4j.properties"
+      tofile="${buildDir}/WEB-INF/classes/log4j.properties"/>
+  </target>
+  
+  <target name="war" depends="clean,compile,copy">
+    <jar jarfile="${warName}" basedir="${buildDir}" />
+  </target>
+  
+  <path id="test.classpath">
+     <pathelement location="${buildDir}/WEB-INF/classes"/>
+     <path refid="classpath"/>
+   </path>
+  
+  <target name="compile.test.classes">
+    <javac srcdir="src/test" destdir="${buildDir}/WEB-INF/classes" debug="true" includes="**/*.java" classpathref="test.classpath" />           
+  </target>
+  
+  <target name="test" depends="compile.test.classes">
+    <delete failonerror="false" dir="test-output"/>
+    <mkdir dir="test-output"/>
+    <testng
+      classpathref="test.classpath"
+      outputdir="test-output"
+      haltonfailure="true"      
+    >
+      <classfileset dir="${buildDir}/WEB-INF/classes" includes="**/*Test.class"/>
+      
+    </testng>
+  </target>
+  
+  
+  <target name="codeanalysis" depends="clean, compile">
+    <delete failonerror="false" dir="code-analysis"/>
+    <mkdir dir="code-analysis"/>
+    <echo message="Running PMD" />
+    <pmd>
+      <ruleset>rulesets/basic.xml</ruleset>
+      <ruleset>rulesets/imports.xml</ruleset>
+      <ruleset>rulesets/unusedcode.xml</ruleset>
+      <formatter type="xml" toFile="code-analysis/pmd.xml" toConsole="true"/>
+      <fileset dir="src/main">
+          <include name="**/*.java"/>
+      </fileset>
+    </pmd>
+    
+    <echo message="Running CheckStyle" />
+    <checkstyle config="${basedir}/WebContent/WEB-INF/lib/code_checks.xml" failonviolation="false">
+	   <formatter type="xml" tofile="code-analysis/checkstyle.xml"/>
+	   <fileset dir="src/main" includes="**/*.java"/>
+    </checkstyle>
+    
+  </target>
+  
+  <target name="generate.api.docs">
+    <delete dir="api-docs" failonerror="false"/>
+    <mkdir dir="api-docs" />
+    <javadoc destdir="api-docs">
+      <packageset dir="src/main" defaultexcludes="yes">
+	      <include name="**"/>
+      </packageset>
+    </javadoc>
+  </target>
+  
+  <target name="update.db">
+    <updateDatabase
+      changeLogFile="db-changelog.xml"
+      driver="com.mysql.jdbc.Driver"
+      url="jdbc:mysql://localhost/demoapp"
+      username="demoapp"
+      password="demoapp"
+      dropFirst="false"
+      classpathref="classpath"
+    />
+  </target>
+
+
+  <target name="undeploy.war">
+  	<delete dir="${tomcat.home}/webapps/${app.name}" failonerror="false"/>
+  	<delete file="${tomcat.home}/webapps/${warName}" failonerror="false"/>
+  	<sleep seconds="5" />
+  </target>
+
+  <target name="deploy.war">
+  	<copy file="${warName}" todir="${tomcat.home}/webapps" />
+  	<sleep seconds="5" />
+  </target>
+    
+</project>

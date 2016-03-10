@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+  <changeSet id="1" author="aarias">
+    <comment>Creating table person</comment>
+    <createTable tableName="person">
+      <column name="id" type="int" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>      
+      <column name="first_name" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_name" type="varchar(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="hire_date" type="datetime">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  
+  <changeSet id="2" author="aarias">
+    <comment>Just adding some stuff to the person table</comment>
+    <insert tableName="person">
+      <column name="first_name" value="John" />
+      <column name="last_name" value="Doe" />
+      <column name="hire_date" value="2012-03-13" />
+    </insert>
+    <insert tableName="person">
+      <column name="first_name" value="Jane" />
+      <column name="last_name" value="Smith" />
+      <column name="hire_date" value="2010-01-01" />
+    </insert>
+    <insert tableName="person">
+      <column name="first_name" value="Dude" />
+      <column name="last_name" value="McDerp" />
+      <column name="hire_date" value="2014-03-01" />
+    </insert>
+    <insert tableName="person">
+      <column name="first_name" value="Foo" />
+      <column name="last_name" value="Bar" />
+      <column name="hire_date" value="2013-02-01" />
+    </insert>
+  </changeSet>
+</databaseChangeLog>
