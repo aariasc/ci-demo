@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 public class PersonCategoryHelperTest {
-
+  private int x = 0;
 	@Test
 	public void verifyRookieLevel(){		
 		//Today
